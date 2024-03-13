@@ -63,14 +63,18 @@ class MazeGame:
         #### READ FROM INPUT FILE HERE
         delivery_locations = PriorityQueue()
 
+        #### General list to hold delivery locations - to be able to look at all locations
+        #### Fill this list from input file - fill priority queue from this list
+        self.locations = set()
+        for x in self.locations:
+            delivery_locations.put(x)
+
         #### Start state: (0,0) or top left to start -> should always be updated as current location
         self.agent_pos = (0, 0)
 
-        ### Priority queue to hold delivery locations - will come from text file
-        self.locations = []
-
         #### Goal state: start with first location from the priority queue
-        self.goal_pos = delivery_locations.get()
+        self.goal_pos = (0,0)
+        self.goals_completed = set()
 
         self.cells = [[Cell(x, y, maze[x][y] == 1) for y in range(self.cols)] for x in range(self.rows)]
 
@@ -97,9 +101,26 @@ class MazeGame:
         #self.draw_maze() - DISPLAY GRAPHIC
 
         #### Display the optimum path in the maze
-        #### LOOP UNTIL ALL LOCATIONS REACHED?? - CALL AGAIN WITH NEW GOAL POPPED FROM QUEUE ONCE RETURNS GOAL STATE
-        #### IF ADD LOOP HERE - ALSO ADD CHECKING FOR MULTIPLE DELIVERIES IN 1 WARD BEFORE MOVING TO HIGHER PRIORITY
-        self.find_path(delivery_locations)
+        while (delivery_locations):
+            # get the current ward
+            current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
+            # check if there are anymore deliveries in the list in that ward
+            for x in self.locations:
+                #if it is in the same ward and has not been visited already
+                if self.cells[x[0]][x[1]].ward == current_ward and x not in self.goals_completed:
+                    self.goal_pos = x
+                # if not delivery locations not yet visited in same ward as current ward, look at priority queue
+                else:
+                    #check the next element in the priority queue
+                    goal = delivery_locations.get()
+                    #make sure goal has not yet been visited - if it has, pop until you find oen that hasn't been
+                    while goal in self.goals_completed:
+                        goal = delivery_locations.get()
+                    self.goal_pos = goal
+            #now that you have the correct next delivery, find the optimum path using designated algorithm
+            self.find_path()
+            #once it returns the correct path, repeat to find the next element
+
 
     ############################################################
     #### Manhattan distance - heuristic for A* algorithm
@@ -117,7 +138,7 @@ class MazeGame:
     #### Algorithm
     #### Only difference between A* and Dijkstra is the heuristic function that is used
     ############################################################
-    def find_path(self, delivery_locations):
+    def find_path(self):
         open_set = PriorityQueue()
 
         #### Add the start state to the queue
@@ -131,6 +152,7 @@ class MazeGame:
             #### Stop if goal is reached
             if current_pos == self.goal_pos:
                 #self.reconstruct_path() -> used only for GUI
+                self.goals_completed.add(self.goal_pos)
                 break
 
             #### Agent goes E, W, N, and S, whenever possible
@@ -159,6 +181,8 @@ class MazeGame:
 
                         #### Add the new cell to the priority queue
                         open_set.put((self.cells[new_pos[0]][new_pos[1]].f, new_pos))
+
+                        #### ADD LIST HERE TO KEEP RUNNING TOTAL OF THE PATH THAT IS NOT OVERWRITTEN EVERY TIME YOU CALL THIS METHOD
 
     ############################################################
     #### Representation of maze based on breakdown of provided image
