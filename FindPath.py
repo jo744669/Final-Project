@@ -41,7 +41,7 @@ class MazeGame:
         if self.cells[x][y].ward == "ICU" or self.cells[x][y].ward == "ER":
             self.cells[x][y].priority = 5
         elif self.cells[x][y].ward == "Oncology" or self.cells[x][y].ward == "Burn":
-            self.cells[x][y].priority == 5
+            self.cells[x][y].priority = 5
         elif self.cells[x][y].ward == "Surgical" or self.cells[x][y].ward == "Maternity":
             self.cells[x][y].priority = 4
         elif self.cells[x][y].ward == "Hematology" or self.cells[x][y].ward == "Pediatric":
@@ -60,14 +60,17 @@ class MazeGame:
         self.rows = len(maze) #MAZE WILL BE BOX ONLY VIEW OF IMAGE PROVIDED - ONCE DETERMINED HOW WE ARE BREAKING IT DOWN
         self.cols = len(maze[0])
 
+        #### READ FROM INPUT FILE HERE
+        delivery_locations = PriorityQueue()
+
         #### Start state: (0,0) or top left to start -> should always be updated as current location
         self.agent_pos = (0, 0)
 
         ### Priority queue to hold delivery locations - will come from text file
         self.locations = []
 
-        #### Goal state: WILL BE BASED ON PRIORITY QUEUE - 0,0 to start for init
-        self.goal_pos = (0, 0)
+        #### Goal state: start with first location from the priority queue
+        self.goal_pos = delivery_locations.get()
 
         self.cells = [[Cell(x, y, maze[x][y] == 1) for y in range(self.cols)] for x in range(self.rows)]
 
@@ -94,7 +97,9 @@ class MazeGame:
         #self.draw_maze() - DISPLAY GRAPHIC
 
         #### Display the optimum path in the maze
-        self.find_path()
+        #### LOOP UNTIL ALL LOCATIONS REACHED?? - CALL AGAIN WITH NEW GOAL POPPED FROM QUEUE ONCE RETURNS GOAL STATE
+        #### IF ADD LOOP HERE - ALSO ADD CHECKING FOR MULTIPLE DELIVERIES IN 1 WARD BEFORE MOVING TO HIGHER PRIORITY
+        self.find_path(delivery_locations)
 
     ############################################################
     #### Manhattan distance - heuristic for A* algorithm
@@ -112,12 +117,11 @@ class MazeGame:
     #### Algorithm
     #### Only difference between A* and Dijkstra is the heuristic function that is used
     ############################################################
-    def find_path(self):
+    def find_path(self, delivery_locations):
         open_set = PriorityQueue()
 
         #### Add the start state to the queue
-        #### Adds to the queue based on the prioiryt assigned based on the ward
-        open_set.put((self.cells[self.agent_pos[0]][self.agent_pos[1]].priority, self.agent_pos))
+        open_set.put((0, self.agent_pos))
 
         #### Continue exploring until the queue is exhausted
         while not open_set.empty():
