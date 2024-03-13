@@ -15,7 +15,7 @@ from queue import PriorityQueue
 #### A cell is either open or part of a wall
 ######################################################
 class Cell:
-    #### Initially, arre maze cells have g() = inf and h() = 0
+    #### Initially, all maze cells have g() = inf and h() = 0
     def __init__(self, x, y, is_wall=False):
         self.x = x
         self.y = y
@@ -36,6 +36,23 @@ class Cell:
 # A maze is a grid of size rows X cols
 ######################################################
 class MazeGame:
+    def assign_priorities(self, x, y):
+        #function to check the ward of the cell at the given position and assign priority accordingly
+        if self.cells[x][y].ward == "ICU" or self.cells[x][y].ward == "ER":
+            self.cells[x][y].priority = 5
+        elif self.cells[x][y].ward == "Oncology" or self.cells[x][y].ward == "Burn":
+            self.cells[x][y].priority == 5
+        elif self.cells[x][y].ward == "Surgical" or self.cells[x][y].ward == "Maternity":
+            self.cells[x][y].priority = 4
+        elif self.cells[x][y].ward == "Hematology" or self.cells[x][y].ward == "Pediatric":
+            self.cells[x][y].priority = 3
+        elif self.cells[x][y].ward == "Medical" or self.cells[x][y].ward == "General":
+            self.cells[x][y].priority = 2
+        elif self.cells[x][y].ward == "Admissions" or self.cells[x][y].ward == "Isolation":
+            self.cells[x][y].priority = 1
+        else:
+            self.cells[x][y].priority = -1
+
     def __init__(self, root, maze):
         self.root = root
         self.maze = maze
