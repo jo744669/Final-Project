@@ -57,9 +57,8 @@ class MazeGame:
         self.root = root
         self.maze = maze
 
-        self.rows = len(maze) #MAZE WILL BE BOX ONLY VIEW OF IMAGE PROVIDED - ONCE DETERMINED HOW WE ARE BREAKING IT DOWN
-        self.cols = len(maze[0])
-
+        self.rows = 38
+        self.cols = 30
         #### READ FROM INPUT FILE HERE
         delivery_locations = PriorityQueue()
 
@@ -78,7 +77,11 @@ class MazeGame:
 
         self.cells = [[Cell(x, y, maze[x][y] == 1) for y in range(self.cols)] for x in range(self.rows)]
 
-        ### ASSIGN PRIORITY AND WARD TO EACH CELL HERE?
+        ### ASSIGN WARDS TO EVERY CELL HERE
+
+        ### Assigning priority to each cell based on its ward
+        for cell in self.cells:
+            self.assign_priorities(cell[0], cell[1])
 
         ### Assign the algorithm based on input - 1 for A*, 2 for Dijkstra - A* by default
         self.algorithm = 1
