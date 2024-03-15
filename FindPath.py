@@ -59,26 +59,103 @@ class MazeGame:
 
     def assign_wards(self):
         x = 0; y = 0
-        # First 3 rows being assigned their wards
+        # rows 0 - 3
         while y < 3:
             self.cells[0][y].ward = "Hallway"
             self.cells[1][y].ward = "Hallway"
             self.cells[2][y].ward = "Hallway"
+            self.cells[3][y].ward = "Hallway"
+            self.cells[4][y].ward = "Hallway"
+            self.cells[5][y].ward = "Hallway"
             y += 1
         y = 3
         while y < 12:
             self.cells[0][y].ward = "Maternity"
             self.cells[1][y].ward = "Maternity"
             self.cells[2][y].ward = "Maternity"
+            self.cells[3][y].ward = "Maternity"
             y += 1
         y = 12
         while y < 38:
             self.cells[0][y].ward = "Hallway"
             self.cells[1][y].ward = "Hallway"
             self.cells[2][y].ward = "Hallway"
+            self.cells[3][y].ward = "Hallway"
             y += 1
-        # rows 3 - 5
 
+        # rows 4 - 6
+        y = 3
+        while y < 11:
+            self.cells[4][y].ward = "Maternity"
+            self.cells[5][y].ward = "Maternity"
+            y += 1
+        self.cells[4][11].ward = "General"
+        self.cells[5][11].ward = "Maternity"
+        y = 12
+        while y < 29:
+            self.cells[4][y].ward = "General"
+            self.cells[5][y].ward = "General"
+            self.cells[6][y].ward = "General"
+            y += 1
+        y = 29
+        while y < 38:
+            self.cells[4][y].ward = "Hallway"
+            self.cells[5][y].ward = "Hallway"
+            y += 1
+        self.cells[6][0].ward = "Hallway"
+        self.cells[6][1].ward = "Hallway"
+        self.cells[6][2].ward = "Hallway"
+        self.cells[6][3].ward = "Maternity"
+        self.cells[6][4].ward = "Maternity"
+        self.cells[6][5].ward = "Hallway"
+        self.cells[6][6].ward = "Maternity"
+        self.cells[6][7].ward = "Maternity"
+        self.cells[6][8].ward = "General"
+        self.cells[6][9].ward = "General"
+        self.cells[6][10].ward = "Maternity"
+        self.cells[6][11].ward = "Maternity"
+        self.cells[6][29].ward = "Hallway"
+        self.cells[6][30].ward = "Emergency"
+        self.cells[6][31].ward = "Emergency"
+        self.cells[6][32].ward = "Emergency"
+        self.cells[6][33].ward = "Emergency"
+        self.cells[6][34].ward = "Emergency"
+
+        #rows 7 - 10
+        y = 0; x = 7
+        while x < 5:
+            while y < 26:
+                self.cells[x][y].ward = "Hallway"
+                y += 1
+            x += 1
+        self.cells[7][5].ward = "Hallway"
+        self.sells[7][6].ward = "Hallway"
+        y = 7; x = 7
+        while x < 11:
+            while y < 27:
+                self.cells[x][y].ward = "General"
+                y += 1
+            x += 1
+        self.cells[7][27].ward = "General"
+        self.cells[7][28].ward = "Hallway"
+        self.cells[7][29].ward = "Hallway"
+        self.cells[8][5].ward = "Isolation"
+        self.cells[8][6].ward = "Isolation"
+        self.cells[8][27].ward = "Isolation"
+        self.cells[8][28].ward = "Isolation"
+        self.cells[8][29].ward = "Hallway"
+        x = 7; y = 30
+        while x < 12:
+            while y < 35:
+                self.cells[x][y].ward = "Emergency"
+                y += 1
+            x += 1
+        x = 6; y = 35
+        while x < 14:
+            while y < 38:
+                self.cells[x][y].ward = "Admissions"
+                y += 1
+            x += 1
 
     def __init__(self, root, maze):
         self.root = root
