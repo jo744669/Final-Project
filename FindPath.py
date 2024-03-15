@@ -36,22 +36,49 @@ class Cell:
 # A maze is a grid of size rows X cols
 ######################################################
 class MazeGame:
-    def assign_priorities(self, x, y):
+    def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
-        if self.cells[x][y].ward == "ICU" or self.cells[x][y].ward == "ER":
-            self.cells[x][y].priority = 5
-        elif self.cells[x][y].ward == "Oncology" or self.cells[x][y].ward == "Burn":
-            self.cells[x][y].priority = 5
-        elif self.cells[x][y].ward == "Surgical" or self.cells[x][y].ward == "Maternity":
-            self.cells[x][y].priority = 4
-        elif self.cells[x][y].ward == "Hematology" or self.cells[x][y].ward == "Pediatric":
-            self.cells[x][y].priority = 3
-        elif self.cells[x][y].ward == "Medical" or self.cells[x][y].ward == "General":
-            self.cells[x][y].priority = 2
-        elif self.cells[x][y].ward == "Admissions" or self.cells[x][y].ward == "Isolation":
-            self.cells[x][y].priority = 1
-        else:
-            self.cells[x][y].priority = -1
+        for y in range(self.cols):
+            for x in range(self.rows):
+                if self.cells[x][y].ward == "ICU" or self.cells[x][y].ward == "ER":
+                    self.cells[x][y].priority = 5
+                elif self.cells[x][y].ward == "Oncology" or self.cells[x][y].ward == "Burn":
+                    self.cells[x][y].priority = 5
+                elif self.cells[x][y].ward == "Surgical" or self.cells[x][y].ward == "Maternity":
+                    self.cells[x][y].priority = 4
+                elif self.cells[x][y].ward == "Hematology" or self.cells[x][y].ward == "Pediatric":
+                    self.cells[x][y].priority = 3
+                elif self.cells[x][y].ward == "Medical" or self.cells[x][y].ward == "General":
+                    self.cells[x][y].priority = 2
+                elif self.cells[x][y].ward == "Admissions" or self.cells[x][y].ward == "Isolation":
+                    self.cells[x][y].priority = 1
+                elif self.cells[x][y].ward == "Hallway":
+                    self.cells[x][y].priority = 0
+                else:
+                    self.cells[x][y].priority = -1 #if ward not correct - assigns priority -1
+
+    def assign_wards(self):
+        x = 0; y = 0
+        # First 3 rows being assigned their wards
+        while y < 3:
+            self.cells[0][y].ward = "Hallway"
+            self.cells[1][y].ward = "Hallway"
+            self.cells[2][y].ward = "Hallway"
+            y += 1
+        y = 3
+        while y < 12:
+            self.cells[0][y].ward = "Maternity"
+            self.cells[1][y].ward = "Maternity"
+            self.cells[2][y].ward = "Maternity"
+            y += 1
+        y = 12
+        while y < 38:
+            self.cells[0][y].ward = "Hallway"
+            self.cells[1][y].ward = "Hallway"
+            self.cells[2][y].ward = "Hallway"
+            y += 1
+        # rows 3 - 5
+
 
     def __init__(self, root, maze):
         self.root = root
@@ -78,6 +105,8 @@ class MazeGame:
         self.cells = [[Cell(x, y, maze[x][y] == 1) for y in range(self.cols)] for x in range(self.rows)]
 
         ### ASSIGN WARDS TO EVERY CELL HERE
+        self.assign_wards()
+
 
         ### Assigning priority to each cell based on its ward
         for cell in self.cells:
