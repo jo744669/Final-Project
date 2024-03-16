@@ -123,13 +123,13 @@ class MazeGame:
 
         #rows 7 - 10
         y = 0; x = 7
-        while x < 5:
-            while y < 26:
+        while x < 26:
+            while y < 5:
                 self.cells[x][y].ward = "Hallway"
                 y += 1
             x += 1
         self.cells[7][5].ward = "Hallway"
-        self.sells[7][6].ward = "Hallway"
+        self.cells[7][6].ward = "Hallway"
         y = 7; x = 7
         while x < 11:
             while y < 27:
@@ -156,6 +156,16 @@ class MazeGame:
                 self.cells[x][y].ward = "Admissions"
                 y += 1
             x += 1
+        self.cells[9][5].ward = "Hallway"
+        self.cells[9][6].ward = "Isolation"
+        self.cells[10][5].ward = "Hallway"
+        self.cells[10][6].ward = "Isolation"
+        self.cells[9][27].ward = "Isolation"
+        self.cells[9][28].ward = "Isolation"
+        self.cells[9][29].ward = "Hallway"
+        self.cells[10][27].ward = "Isolation"
+        self.cells[10][28].ward = "Isolation"
+        self.cells[10][29].ward = "Hallway"
 
     def __init__(self, root, maze):
         self.root = root
