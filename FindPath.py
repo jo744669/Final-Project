@@ -244,7 +244,7 @@ class MazeGame:
         self.cells[13][33].ward = "Admissions"
         self.cells[13][34].ward = "Admissions"
 
-        #rows 14 - 16 DO ROW 16
+        #rows 14 - 16
         self.cells[14][5].ward = "Oncology"
         self.cells[14][6].ward = "Oncology"
         self.cells[14][7].ward = "Oncology"
@@ -287,13 +287,35 @@ class MazeGame:
         self.cells[15][20].ward = "General"
         self.cells[15][21].ward = "General"
         self.cells[15][22].ward = "General"
-        self.cells[15][23].ward = "General"
+        self.cells[15][23].ward = "Isolation"
         self.cells[15][24].ward = "Isolation"
         self.cells[15][25].ward = "Oncology"
         self.cells[15][26].ward = "Oncology"
         self.cells[15][27].ward = "Oncology"
         self.cells[15][28].ward = "Oncology"
         self.cells[15][29].ward = "Hallway"
+
+        self.cells[16][5].ward = "Oncology"
+        self.cells[16][6].ward = "Oncology"
+        self.cells[16][7].ward = "Oncology"
+        self.cells[16][8].ward = "Oncology"
+        y = 9
+        while y < 17:
+            self.cells[16][y].ward = "Burn"
+            y += 1
+        self.cells[16][17].ward = "General"
+        self.cells[16][18].ward = "General"
+        self.cells[16][19].ward = "General"
+        self.cells[16][20].ward = "General"
+        self.cells[16][21].ward = "General"
+        self.cells[16][22].ward = "Hallway"
+        self.cells[16][23].ward = "Isolation"
+        self.cells[16][24].ward = "Isolation"
+        self.cells[16][25].ward = "Oncology"
+        self.cells[16][26].ward = "Oncology"
+        self.cells[16][27].ward = "Oncology"
+        self.cells[16][28].ward = "Oncology"
+        self.cells[16][29].ward = "Hallway"
 
     def __init__(self, root, maze):
         self.root = root
