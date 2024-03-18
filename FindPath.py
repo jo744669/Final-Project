@@ -173,7 +173,7 @@ class MazeGame:
         self.cells[11][7].ward = "Hallway"
         self.cells[11][8].ward = "Hallway"
         y = 9
-        while (y < 23):
+        while y < 23:
             self.cells[11][y].ward = "General"
             y += 1
         self.cells[11][23].ward = "Emergency"
@@ -243,6 +243,57 @@ class MazeGame:
         self.cells[13][32].ward = "Admissions"
         self.cells[13][33].ward = "Admissions"
         self.cells[13][34].ward = "Admissions"
+
+        #rows 14 - 16 DO ROW 16
+        self.cells[14][5].ward = "Oncology"
+        self.cells[14][6].ward = "Oncology"
+        self.cells[14][7].ward = "Oncology"
+        self.cells[14][8].ward = "Oncology"
+        y = 9
+        while y < 18:
+            self.cells[14][y].ward = "Burn"
+            y += 1
+        self.cells[14][18].ward = "General"
+        self.cells[14][19].ward = "General"
+        self.cells[14][20].ward = "General"
+        self.cells[14][21].ward = "General"
+        self.cells[14][22].ward = "General"
+        self.cells[14][23].ward = "Emergency"
+        self.cells[14][24].ward = "Emergency"
+        self.cells[14][25].ward = "Oncology"
+        self.cells[14][26].ward = "Oncology"
+        self.cells[14][27].ward = "Emergency"
+        self.cells[14][28].ward = "Emergency"
+        self.cells[14][29].ward = "Hallway"
+        y = 30
+        while y < 38:
+            self.cells[14][y].ward = "ICU"
+            self.cells[15][y].ward = "ICU"
+            self.cells[16][y].ward = "ICU"
+            if y > 30:
+                self.cells[16][y].ward = "ICU"
+                self.cells[17][y].ward = "ICU"
+            y += 1
+        self.cells[15][5].ward = "Oncology"
+        self.cells[15][6].ward = "Oncology"
+        self.cells[15][7].ward = "Oncology"
+        self.cells[15][8].ward = "Oncology"
+        y = 9
+        while y < 18:
+            self.cells[15][y].ward = "Burn"
+            y += 1
+        self.cells[15][18].ward = "General"
+        self.cells[15][19].ward = "General"
+        self.cells[15][20].ward = "General"
+        self.cells[15][21].ward = "General"
+        self.cells[15][22].ward = "General"
+        self.cells[15][23].ward = "General"
+        self.cells[15][24].ward = "Isolation"
+        self.cells[15][25].ward = "Oncology"
+        self.cells[15][26].ward = "Oncology"
+        self.cells[15][27].ward = "Oncology"
+        self.cells[15][28].ward = "Oncology"
+        self.cells[15][29].ward = "Hallway"
 
     def __init__(self, root, maze):
         self.root = root
