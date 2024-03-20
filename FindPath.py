@@ -454,6 +454,70 @@ class MazeGame:
         self.cells[22][25].ward = "Surgical"
         self.cells[22][26].ward = "Surgical"
 
+        #rows 23 - 25
+        self.cells[23][5].ward = "Hallway"
+        self.cells[23][6].ward = "Oncology"
+        self.cells[23][7].ward = "Oncology"
+        self.cells[23][8].ward = "Oncology"
+        self.cells[23][9].ward = "Oncology"
+        y = 10
+        while y < 22:
+            self.cells[23][y].ward = "Pediatric"
+            y += 1
+        self.cells[23][22].ward = "Hallway"
+        self.cells[23][23].ward = "Surgical"
+        self.cells[23][24].ward = "Surgical"
+        self.cells[23][25].ward = "Surgical"
+        self.cells[23][26].ward = "Surgical"
+
+        y = 5
+        while y < 24:
+            self.cells[24][y].ward = "Hallway"
+            self.cells[25][y].ward = "Hallway"
+            y += 1
+        y = 24
+        while y < 36:
+            self.cells[24][y].ward = "Surgical"
+            self.cells[25][y].ward = "Surgical"
+            y += 1
+        x = 26; y = 0
+        while x < 30:
+            while y < 3:
+                self.cells[x][y].ward = "Hallway"
+                y += 1
+            x += 1
+
+        #rows 26 - 29
+        self.cells[26][3].ward = "Hallway"
+        self.cells[26][4].ward = "Oncology"
+        self.cells[26][5].ward = "Oncology"
+        x = 26; y = 6
+        while x < 30:
+            while y < 24:
+                self.cells[x][y].ward = "Pediatric"
+                y += 1
+            x += 1
+        x = 26; y = 24
+        while x < 30:
+            while y < 36:
+                self.cells[x][y].ward = "Surgical"
+                if y == 25:
+                    y = 30
+                else:
+                    y += 1
+            x += 1
+        self.cells[26][26].ward = "Medical"
+        self.cells[26][27].ward = "Surgical"
+        self.cells[26][28].ward = "Medical"
+        self.cells[26][29].ward = "Medical"
+        x = 27; y = 26
+        while x < 30:
+            while y < 30:
+                self.cells[x][y].ward = "Medical"
+                y += 1
+            x += 1
+
+
     def __init__(self, root, maze):
         self.root = root
         self.maze = maze
