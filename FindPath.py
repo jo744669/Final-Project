@@ -516,6 +516,15 @@ class MazeGame:
                 self.cells[x][y].ward = "Medical"
                 y += 1
             x += 1
+        self.cells[27][3].ward = "Hallway"
+        self.cells[27][4].ward = "Oncology"
+        self.cells[27][5].ward = "Oncology"
+        self.cells[28][3].ward = "Hallway"
+        self.cells[28][4].ward = "Hallway"
+        self.cells[28][5].ward = "Hallway"
+        self.cells[29][3].ward = "Isolation"
+        self.cells[29][4].ward = "Isolation"
+        self.cells[29][5].ward = "Isolation"
 
 
     def __init__(self, root, maze):
