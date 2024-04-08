@@ -535,6 +535,7 @@ class MazeGame:
 
         self.locations = set()
         delivery_locations = PriorityQueue()
+        self.fullPath = set() #keeps track of full path to every location in order
 
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
@@ -626,6 +627,9 @@ class MazeGame:
             current_cost, current_pos = open_set.get()
             current_cell = self.cells[current_pos[0]][current_pos[1]]
 
+            #### Adds to running full path to keep running list of everywhere agent has been
+            self.fullPath.add(current_pos)
+
             #### Stop if goal is reached
             if current_pos == self.goal_pos:
                 #self.reconstruct_path() -> used only for GUI
@@ -656,7 +660,6 @@ class MazeGame:
                     #### Add the new cell to the priority queue
                     open_set.put((self.cells[new_pos[0]][new_pos[1]].f, new_pos))
 
-                    #### ADD LIST HERE TO KEEP RUNNING TOTAL OF THE PATH THAT IS NOT OVERWRITTEN EVERY TIME YOU CALL THIS METHOD
 
     ############################################################
     #### Representation of maze based on breakdown of provided image
