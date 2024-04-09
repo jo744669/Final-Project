@@ -35,6 +35,85 @@ class Cell:
 # A maze is a grid of size rows X cols
 ######################################################
 class MazeGame:
+    def __init__(self, root, maze):
+        self.root = root
+        self.maze = maze
+
+        self.rows = 38
+        self.cols = 30
+
+        #### Start state: (0,0) or top left to start -> should always be updated as current location
+        self.agent_pos = (0, 0)
+
+        #### Goal state: start with first location from the priority queue
+        self.goal_pos = (0,0)
+        self.goals_completed = set()
+
+        ### Creates cell object for every cell and assigns the wards and priorities to each cell
+        self.cells = [[Cell(x, y) for y in range(self.cols)] for x in range(self.rows)]
+        self.assign_wards()
+        self.assign_priorities()
+
+        ### Read from input file after assigning priorities and wards and buidling cells
+        self.locations = set()
+        delivery_locations = PriorityQueue()
+        self.fullPath = set()  # keeps track of full path to every location in order
+
+        #### READ FROM INPUT FILE HERE
+        # add all locations to self.locations
+        # update self.algorithm based on if using A* or Dijkstra
+        self.locations.add((2,7)) #for testing
+
+        #### General list to hold delivery locations - to be able to look at all locations
+        #### Fill this list from input file - fill priority queue from this list
+        for x in self.locations:
+            delivery_locations.put(x)
+
+        ### Assign the algorithm based on input - 1 for A*, 2 for Dijkstra - A* by default
+        self.algorithm = 1
+
+        #### Start state's initial values for f(n) = g(n) + h(n)
+        self.cells[self.agent_pos[0]][self.agent_pos[1]].g = 0
+        if self.algorithm == 1:
+            self.cells[self.agent_pos[0]][self.agent_pos[1]].h = self.Astar_heuristic(self.agent_pos)
+            self.cells[self.agent_pos[0]][self.agent_pos[1]].f = self.Astar_heuristic(self.agent_pos)
+        elif self.algorithm == 2:
+            self.cells[self.agent_pos[0]][self.agent_pos[1]].h = self.Dijkstra_heuristic(self.agent_pos)
+            self.cells[self.agent_pos[0]][self.agent_pos[1]].f = self.Dijkstra_heuristic(self.agent_pos)
+
+        # GRAPHICS - TO BE CHANGED LATER
+        #### The maze cell size in pixels
+        #self.cell_size = 75
+        #self.canvas = tk.Canvas(root, width=self.cols * self.cell_size, height=self.rows * self.cell_size, bg='white')
+        #self.canvas.pack()
+
+        #self.draw_maze() - DISPLAY GRAPHIC
+
+        #### Display the optimum path in the maze
+        while delivery_locations:
+            # get the current ward
+            current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
+            # check if there are anymore deliveries in the list in that ward
+            for x in self.locations:
+                #if it is in the same ward and has not been visited already
+                if self.cells[x[0]][x[1]].ward == current_ward and x not in self.goals_completed:
+                    self.goal_pos = x
+                # if not delivery locations not yet visited in same ward as current ward, look at priority queue
+                else:
+                    #check the next element in the priority queue
+                    goal = delivery_locations.get()
+                    #make sure goal has not yet been visited - if it has, pop until you find oen that hasn't been
+                    while goal in self.goals_completed:
+                        goal = delivery_locations.get()
+                    self.goal_pos = goal
+            #now that you have the correct next delivery, find the optimum path using designated algorithm
+            self.find_path()
+            # once it returns the correct path, repeat to find the next element
+
+        #print the full path found for testing reasons
+        for x in self.fullPath:
+            print(x + " -> ")
+
     def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
         for y in range(self.cols):
@@ -525,86 +604,6 @@ class MazeGame:
         self.cells[29][4].ward = "Isolation"
         self.cells[29][5].ward = "Isolation"
 
-
-    def __init__(self, root, maze):
-        self.root = root
-        self.maze = maze
-
-        self.rows = 38
-        self.cols = 30
-
-        #### Start state: (0,0) or top left to start -> should always be updated as current location
-        self.agent_pos = (0, 0)
-
-        #### Goal state: start with first location from the priority queue
-        self.goal_pos = (0,0)
-        self.goals_completed = set()
-
-        ### Creates cell object for every cell and assigns the wards and priorities to each cell
-        self.cells = [[Cell(x, y) for y in range(self.cols)] for x in range(self.rows)]
-        self.assign_wards()
-        self.assign_priorities()
-
-        ### Read from input file after assigning priorities and wards and buidling cells
-        self.locations = set()
-        delivery_locations = PriorityQueue()
-        self.fullPath = set()  # keeps track of full path to every location in order
-
-        #### READ FROM INPUT FILE HERE
-        # add all locations to self.locations
-        # update self.algorithm based on if using A* or Dijkstra
-
-        #### General list to hold delivery locations - to be able to look at all locations
-        #### Fill this list from input file - fill priority queue from this list
-        for x in self.locations:
-            delivery_locations.put(x)
-
-        ### Assign the algorithm based on input - 1 for A*, 2 for Dijkstra - A* by default
-        self.algorithm = 1
-
-        #### Start state's initial values for f(n) = g(n) + h(n)
-        self.cells[self.agent_pos[0]][self.agent_pos[1]].g = 0
-        if self.algorithm == 1:
-            self.cells[self.agent_pos[0]][self.agent_pos[1]].h = self.Astar_heuristic(self.agent_pos)
-            self.cells[self.agent_pos[0]][self.agent_pos[1]].f = self.Astar_heuristic(self.agent_pos)
-        elif self.algorithm == 2:
-            self.cells[self.agent_pos[0]][self.agent_pos[1]].h = self.Dijkstra_heuristic(self.agent_pos)
-            self.cells[self.agent_pos[0]][self.agent_pos[1]].f = self.Dijkstra_heuristic(self.agent_pos)
-
-        # GRAPHICS - TO BE CHANGED LATER
-        #### The maze cell size in pixels
-        #self.cell_size = 75
-        #self.canvas = tk.Canvas(root, width=self.cols * self.cell_size, height=self.rows * self.cell_size, bg='white')
-        #self.canvas.pack()
-
-        #self.draw_maze() - DISPLAY GRAPHIC
-
-        #### Display the optimum path in the maze
-        while delivery_locations:
-            # get the current ward
-            current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
-            # check if there are anymore deliveries in the list in that ward
-            for x in self.locations:
-                #if it is in the same ward and has not been visited already
-                if self.cells[x[0]][x[1]].ward == current_ward and x not in self.goals_completed:
-                    self.goal_pos = x
-                # if not delivery locations not yet visited in same ward as current ward, look at priority queue
-                else:
-                    #check the next element in the priority queue
-                    goal = delivery_locations.get()
-                    #make sure goal has not yet been visited - if it has, pop until you find oen that hasn't been
-                    while goal in self.goals_completed:
-                        goal = delivery_locations.get()
-                    self.goal_pos = goal
-            #now that you have the correct next delivery, find the optimum path using designated algorithm
-            self.find_path()
-            # once it returns the correct path, repeat to find the next element
-
-        #print the full path found for testing reasons
-        for x in self.fullPath:
-            print(x + " -> ")
-
-
     ############################################################
     #### Manhattan distance - heuristic for A* algorithm
     ############################################################
@@ -638,6 +637,9 @@ class MazeGame:
             #### Stop if goal is reached
             if current_pos == self.goal_pos:
                 #self.reconstruct_path() -> used only for GUI
+                # print the full path found for testing reasons
+                for x in self.fullPath:
+                    print(x + " -> ")
                 self.goals_completed.add(self.goal_pos)
                 break
 
@@ -666,10 +668,10 @@ class MazeGame:
                     open_set.put((self.cells[new_pos[0]][new_pos[1]].f, new_pos))
 
 
-    ############################################################
-    #### Representation of maze based on breakdown of provided image
-    ############################################################
-    maze = {
+############################################################
+#### Representation of maze based on breakdown of provided image
+############################################################
+maze = {
         (0, 0): [(0, 1), (1, 0)],  # Column 0
         (1, 0): [(0, 0), (1, 1), (2, 0)],  # Up, Right, Down
         (2, 0): [(1, 0), (2, 1), (3, 0)],
@@ -1880,5 +1882,5 @@ class MazeGame:
         (26, 37): [(25, 37), (27, 37), (26, 36)],
         (27, 37): [(26, 37), (28, 37), (27, 36)],
         (28, 37): [(27, 37), (29, 37), (28, 36)],
-        (29, 37): [(28, 37), (29, 36)],
-    }
+        (29, 37): [(28, 37), (29, 36)]
+}
