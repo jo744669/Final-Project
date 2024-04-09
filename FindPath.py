@@ -39,8 +39,8 @@ class MazeGame:
         self.root = root
         self.maze = maze
 
-        self.rows = 38
-        self.cols = 30
+        self.rows = 30
+        self.cols = 38
 
         #### Start state: (0,0) or top left to start -> should always be updated as current location
         self.agent_pos = (0, 0)
@@ -90,7 +90,7 @@ class MazeGame:
         #self.draw_maze() - DISPLAY GRAPHIC
 
         #### Display the optimum path in the maze
-        while delivery_locations:
+        while delivery_locations: #CAUGHT IN AN INFINITE LOOP HERE?
             # get the current ward
             current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
             # check if there are anymore deliveries in the list in that ward
@@ -644,7 +644,7 @@ class MazeGame:
                 break
 
             #### Agent looks at every child of the current cell
-            for neighbor in self.maze[current_cell]:
+            for neighbor in self.maze[current_pos]:
                 new_pos = neighbor
 
                 #### The cost of moving to a new position is 1 unit
@@ -1884,3 +1884,6 @@ maze = {
         (28, 37): [(27, 37), (29, 37), (28, 36)],
         (29, 37): [(28, 37), (29, 36)]
 }
+
+root = (0, 0)
+game = MazeGame(root, maze)
