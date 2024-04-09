@@ -6,7 +6,7 @@
 # Purpose: This project should simulate a robot in a hospital delivering medicine to different patients in different wards
 # dependent upon the priority of the destination ward. It should be implemented using A* and Dijkstra's Algorithms.
 ########################################
-
+from collections import deque
 from queue import PriorityQueue
 
 
@@ -46,7 +46,7 @@ class MazeGame:
         self.agent_pos = (0, 0)
 
         #### Goal state: start with first location from the priority queue
-        self.goal_pos = (0,0)
+        self.goal_pos = (0, 0)
         self.goals_completed = set()
 
         ### Creates cell object for every cell and assigns the wards and priorities to each cell
@@ -57,17 +57,18 @@ class MazeGame:
         ### Read from input file after assigning priorities and wards and buidling cells
         self.locations = set()
         delivery_locations = PriorityQueue()
-        self.fullPath = set()  # keeps track of full path to every location in order
+        self.fullPath = deque()  # keeps track of full path to every location in order
+        self.temporaryPath = deque() #keeps track of path from start to goal to build backwards
 
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
         # update self.algorithm based on if using A* or Dijkstra
-        self.locations.add((2,7)) #for testing
+        self.locations.add((2, 7)) #for testing
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
         for x in self.locations:
-            delivery_locations.put(x)
+            delivery_locations.put((self.cells[x[0]][x[1]].priority, x))
 
         ### Assign the algorithm based on input - 1 for A*, 2 for Dijkstra - A* by default
         self.algorithm = 1
@@ -90,7 +91,7 @@ class MazeGame:
         #self.draw_maze() - DISPLAY GRAPHIC
 
         #### Display the optimum path in the maze
-        while delivery_locations: #CAUGHT IN AN INFINITE LOOP HERE?
+        while not delivery_locations.empty():
             # get the current ward
             current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
             # check if there are anymore deliveries in the list in that ward
@@ -98,6 +99,7 @@ class MazeGame:
                 #if it is in the same ward and has not been visited already
                 if self.cells[x[0]][x[1]].ward == current_ward and x not in self.goals_completed:
                     self.goal_pos = x
+                    self.find_path()
                 # if not delivery locations not yet visited in same ward as current ward, look at priority queue
                 else:
                     #check the next element in the priority queue
@@ -105,14 +107,16 @@ class MazeGame:
                     #make sure goal has not yet been visited - if it has, pop until you find oen that hasn't been
                     while goal in self.goals_completed:
                         goal = delivery_locations.get()
-                    self.goal_pos = goal
-            #now that you have the correct next delivery, find the optimum path using designated algorithm
-            self.find_path()
-            # once it returns the correct path, repeat to find the next element
+                    self.goal_pos = goal[1]
+                    self.find_path()
+
+            # set new start location as previous goal location after path was found
+            self.agent_pos = self.goal_pos
 
         #print the full path found for testing reasons
-        for x in self.fullPath:
-            print(x + " -> ")
+        while self.fullPath:
+            print(self.fullPath.popleft())
+            print(" -> ")
 
     def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
@@ -617,55 +621,106 @@ class MazeGame:
         return 0
 
     ############################################################
+    #### Function to return possible locations to move to from
+    #### current state based on adjacency list
+    ############################################################
+    def get_neighbors(self, v):
+        return self.maze(v)
+
+    ############################################################
     #### Algorithm
     #### Only difference between A* and Dijkstra is the heuristic function that is used
     ############################################################
     def find_path(self):
-        open_set = PriorityQueue()
+        # list of nodes that have been visited but neighbors of them haven't all been looked at
+        open_set = set(self.agent_pos)
 
-        #### Add the start state to the queue
-        open_set.put((0, self.agent_pos))
+        # list of nodes that have been visited and their neighbors have been looked at
+        closed_set = set()
+
+        # contains adjacency map of all nodes
+        parents = {}
 
         #### Continue exploring until the queue is exhausted
-        while not open_set.empty():
-            current_cost, current_pos = open_set.get()
-            current_cell = self.cells[current_pos[0]][current_pos[1]]
+        while len(open_set) > 0:
 
-            #### Adds to running full path to keep running list of everywhere agent has been
-            self.fullPath.add(current_pos)
+            current_pos = None
+            neighbor = (0, 0)
 
-            #### Stop if goal is reached
+            for (new_x, new_y) in open_set:
+                # assign node grabbed from list as new_pos
+                new_pos = (new_x, new_y)
+
+                ### Update the heurstic h() based on algorithm being used
+                if self.algorithm == 1:
+                    self.cells[new_pos[0]][new_pos[1]].h = self.Astar_heuristic(new_pos)
+                if self.algorithm == 2:
+                    self.cells[new_pos[0]][new_pos[1]].h = self.Dijkstra_heuristic(new_pos)
+
+                # update current position if it is a better move
+                if current_pos == None or self.cells[new_pos[0]][new_pos[1]].g + self.cells[new_pos[0]][new_pos[1]].h < self.cells[current_pos[0]][current_pos[1]].g + self.cells[current_pos[0]][current_pos[1]].h:
+                    current_pos = new_pos
+
+            #  print if no path exists from start to goal
+            if current_pos == None:
+                print('Path does not exist')
+                return None
+
+            # if current node is goal node, reconstruct the path
             if current_pos == self.goal_pos:
-                #self.reconstruct_path() -> used only for GUI
-                # print the full path found for testing reasons
-                for x in self.fullPath:
-                    print(x + " -> ")
                 self.goals_completed.add(self.goal_pos)
-                break
+                self.reconstruct_path(parents)
+                return self.fullPath
 
-            #### Agent looks at every child of the current cell
-            for neighbor in self.maze[current_pos]:
-                new_pos = neighbor
+            for (neighbor_x, neighbor_y) in self.get_neighbors(current_pos):
+                # assign neighbor as tuple grabbed from adjacency list
+                neighbor = (neighbor_x, neighbor_y)
 
-                #### The cost of moving to a new position is 1 unit
-                new_g = current_cell.g + 1
+                # if the neighbor node has not been visited at all yet
+                if neighbor not in open_set and neighbor not in closed_set:
+                    open_set.add(neighbor)
+                    # add to parents list for reconstructing later
+                    parents[neighbor] = current_pos
+                    # update g value
+                    self.cells[neighbor[0]][neighbor[1]].g = self.cells[current_pos[0]][current_pos[1]].g + 1
+                # check if quicker to first visit neighbor then current
+                else:
+                    if self.cells[neighbor[0]][neighbor[1]].g > self.cells[current_pos[0]][current_pos[1]].g + 1:
+                        # update parent and g data
+                        self.cells[neighbor[0]][neighbor[1]].g = self.cells[current_pos[0]][current_pos[1]].g + 1
+                        parents[neighbor] = current_pos
 
-                if new_g < self.cells[new_pos[0]][new_pos[1]].g:
-                    ### Update the path cost g()
-                    self.cells[new_pos[0]][new_pos[1]].g = new_g
+                        # if in closed set, remove it and put it in open set
+                        if neighbor in closed_set:
+                            closed_set.remove(neighbor)
+                            open_set.add(neighbor)
 
-                    ### Update the heurstic h() based on algorithm being used
-                    if self.algorithm == 1:
-                        self.cells[new_pos[0]][new_pos[1]].h = self.Astar_heuristic(new_pos)
-                    if self.algorithm == 2:
-                        self.cells[new_pos[0]][new_pos[1]].h = self.Dijkstra_heuristic(new_pos)
+            # remove from open set and put in closed set bc all neighbors now visited
+            open_set.remove(neighbor)
+            closed_set.add(neighbor)
 
-                    ### Update the evaluation function for the cell n: f(n) = g(n) + h(n)
-                    self.cells[new_pos[0]][new_pos[1]].f = new_g + self.cells[new_pos[0]][new_pos[1]].h
-                    self.cells[new_pos[0]][new_pos[1]].parent = current_cell
+        print('Path does not exist')
+        return None
 
-                    #### Add the new cell to the priority queue
-                    open_set.put((self.cells[new_pos[0]][new_pos[1]].f, new_pos))
+    ############################################################
+    #### To rebuild the path and keep a running total of where agent has been
+    #### This is also for the GUI part
+    ############################################################
+    def reconstruct_path(self, parents):
+        current_cell = self.cells[self.goal_pos[0]][self.goal_pos[1]]
+        while current_cell.parent:
+            #build the temporary path of just this portion of movement
+            n = self.goal_pos #finished here so reconstruct starts here
+
+            while parents[n] != n:
+                self.temporaryPath.appendleft(n)
+                n = parents[n]
+
+            self.temporaryPath.appendleft(self.agent_pos) # add start node
+
+            # add the temporary path to the running total once it is complete
+            while self.temporaryPath:
+                self.fullPath.append(self.temporaryPath.popleft())
 
 
 ############################################################
