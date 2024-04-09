@@ -533,19 +533,6 @@ class MazeGame:
         self.rows = 38
         self.cols = 30
 
-        self.locations = set()
-        delivery_locations = PriorityQueue()
-        self.fullPath = set() #keeps track of full path to every location in order
-
-        #### READ FROM INPUT FILE HERE
-        # add all locations to self.locations
-        # update self.algorithm based on if using A* or Dijkstra
-
-        #### General list to hold delivery locations - to be able to look at all locations
-        #### Fill this list from input file - fill priority queue from this list
-        for x in self.locations:
-            delivery_locations.put(x)
-
         #### Start state: (0,0) or top left to start -> should always be updated as current location
         self.agent_pos = (0, 0)
 
@@ -557,6 +544,20 @@ class MazeGame:
         self.cells = [[Cell(x, y) for y in range(self.cols)] for x in range(self.rows)]
         self.assign_wards()
         self.assign_priorities()
+
+        ### Read from input file after assigning priorities and wards and buidling cells
+        self.locations = set()
+        delivery_locations = PriorityQueue()
+        self.fullPath = set()  # keeps track of full path to every location in order
+
+        #### READ FROM INPUT FILE HERE
+        # add all locations to self.locations
+        # update self.algorithm based on if using A* or Dijkstra
+
+        #### General list to hold delivery locations - to be able to look at all locations
+        #### Fill this list from input file - fill priority queue from this list
+        for x in self.locations:
+            delivery_locations.put(x)
 
         ### Assign the algorithm based on input - 1 for A*, 2 for Dijkstra - A* by default
         self.algorithm = 1
@@ -597,7 +598,11 @@ class MazeGame:
                     self.goal_pos = goal
             #now that you have the correct next delivery, find the optimum path using designated algorithm
             self.find_path()
-            #once it returns the correct path, repeat to find the next element
+            # once it returns the correct path, repeat to find the next element
+
+        #print the full path found for testing reasons
+        for x in self.fullPath:
+            print(x + " -> ")
 
 
     ############################################################
