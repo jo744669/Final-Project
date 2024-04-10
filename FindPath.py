@@ -625,7 +625,7 @@ class MazeGame:
     #### current state based on adjacency list
     ############################################################
     def get_neighbors(self, v):
-        return self.maze(v)
+        return self.maze[v]
 
     ############################################################
     #### Algorithm
@@ -633,7 +633,8 @@ class MazeGame:
     ############################################################
     def find_path(self):
         # list of nodes that have been visited but neighbors of them haven't all been looked at
-        open_set = set(self.agent_pos)
+        open_set = set()
+        open_set.add(self.agent_pos)
 
         # list of nodes that have been visited and their neighbors have been looked at
         closed_set = set()
@@ -647,10 +648,7 @@ class MazeGame:
             current_pos = None
             neighbor = (0, 0)
 
-            for (new_x, new_y) in open_set:
-                # assign node grabbed from list as new_pos
-                new_pos = (new_x, new_y)
-
+            for new_pos in open_set:
                 ### Update the heurstic h() based on algorithm being used
                 if self.algorithm == 1:
                     self.cells[new_pos[0]][new_pos[1]].h = self.Astar_heuristic(new_pos)
@@ -672,10 +670,7 @@ class MazeGame:
                 self.reconstruct_path(parents)
                 return self.fullPath
 
-            for (neighbor_x, neighbor_y) in self.get_neighbors(current_pos):
-                # assign neighbor as tuple grabbed from adjacency list
-                neighbor = (neighbor_x, neighbor_y)
-
+            for neighbor in self.get_neighbors(current_pos):
                 # if the neighbor node has not been visited at all yet
                 if neighbor not in open_set and neighbor not in closed_set:
                     open_set.add(neighbor)
@@ -696,8 +691,9 @@ class MazeGame:
                             open_set.add(neighbor)
 
             # remove from open set and put in closed set bc all neighbors now visited
-            open_set.remove(neighbor)
-            closed_set.add(neighbor)
+            if neighbor in open_set and neighbor not in closed_set:
+                open_set.remove(neighbor)
+                closed_set.add(neighbor)
 
         print('Path does not exist')
         return None
