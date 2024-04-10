@@ -658,6 +658,8 @@ class MazeGame:
                 # update current position if it is a better move
                 if current_pos == None or self.cells[new_pos[0]][new_pos[1]].g + self.cells[new_pos[0]][new_pos[1]].h < self.cells[current_pos[0]][current_pos[1]].g + self.cells[current_pos[0]][current_pos[1]].h:
                     current_pos = new_pos
+                    print(current_pos) #for testing purposes
+                    print(" , ")
 
             #  print if no path exists from start to goal
             if current_pos == None:
