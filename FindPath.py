@@ -9,7 +9,6 @@
 import sys
 from collections import deque
 from queue import PriorityQueue
-sys.setrecursionlimit(1200)
 
 ######################################################
 #### A cell stores f(), g() and h() values
@@ -28,7 +27,6 @@ class Cell:
         self.priority = 0 # keep track of what priority cell location has based on ward
 
     #### Compare two cells based on their evaluation functions
-    sys.setrecursionlimit(1200)
     def __lt__(self, other):
         return self.f < other.f
 
@@ -37,7 +35,6 @@ class Cell:
 # A maze is a grid of size rows X cols
 ######################################################
 class MazeGame:
-    sys.setrecursionlimit(10 ** 6)
     def __init__(self, root, maze):
         self.root = root
         self.maze = maze
