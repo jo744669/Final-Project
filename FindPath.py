@@ -646,6 +646,8 @@ class MazeGame:
             # if current node is goal node, reconstruct the path
             if current_pos == self.goal_pos:
                 self.goals_completed.add(self.goal_pos)
+                open.clear()
+                closed.clear()
                 self.reconstruct_path()
                 return self.fullPath
 
