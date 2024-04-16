@@ -63,7 +63,8 @@ class MazeGame:
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
         # update self.algorithm based on if using A* or Dijkstra
-        self.locations.add((2, 7)) #for testing
+        self.locations.add((12, 24)) #for testing
+        self.locations.add((12, 23))
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
@@ -92,11 +93,13 @@ class MazeGame:
 
         #### Display the optimum path in the maze
         while not delivery_locations.empty():
+            # check if there are anymore deliveries in the list in that ward
             # get the current ward
             current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
-            # check if there are anymore deliveries in the list in that ward
             for x in self.locations:
                 #if it is in the same ward and has not been visited already
+                if len(self.fullPath) != 0: #not the first iteration bc already found a path
+                    current_ward = self.cells[self.agent_pos[0]][self.agent_pos[1]].ward
                 if self.cells[x[0]][x[1]].ward == current_ward and x not in self.goals_completed:
                     self.goal_pos = x
                     self.find_path()
@@ -110,33 +113,30 @@ class MazeGame:
                     self.goal_pos = goal[1]
                     self.find_path()
 
-            # set new start location as previous goal location after path was found
-            self.agent_pos = self.goal_pos
-
         #print the full path found for testing reasons
-        while self.fullPath:
-            print(self.fullPath.popleft(), end = ", ")
+        #while self.fullPath:
+        #   print(self.fullPath.popleft(), end = ", ")
 
     def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
         for y in range(self.cols):
             for x in range(self.rows):
-                if self.cells[x][y].ward == "ICU" or self.cells[x][y].ward == "ER":
-                    self.cells[x][y].priority = 5
+                if self.cells[x][y].ward == "ICU" or self.cells[x][y].ward == "Emergency":
+                    self.cells[x][y].priority = -5
                 elif self.cells[x][y].ward == "Oncology" or self.cells[x][y].ward == "Burn":
-                    self.cells[x][y].priority = 5
+                    self.cells[x][y].priority = -5
                 elif self.cells[x][y].ward == "Surgical" or self.cells[x][y].ward == "Maternity":
-                    self.cells[x][y].priority = 4
+                    self.cells[x][y].priority = -4
                 elif self.cells[x][y].ward == "Hematology" or self.cells[x][y].ward == "Pediatric":
-                    self.cells[x][y].priority = 3
+                    self.cells[x][y].priority = -3
                 elif self.cells[x][y].ward == "Medical" or self.cells[x][y].ward == "General":
-                    self.cells[x][y].priority = 2
+                    self.cells[x][y].priority = -2
                 elif self.cells[x][y].ward == "Admissions" or self.cells[x][y].ward == "Isolation":
-                    self.cells[x][y].priority = 1
+                    self.cells[x][y].priority = -1
                 elif self.cells[x][y].ward == "Hallway":
                     self.cells[x][y].priority = 0
                 else:
-                    self.cells[x][y].priority = -1 #if ward not correct - assigns priority -1
+                    self.cells[x][y].priority = 1 #if ward not correct - assigns priority -1
 
     def assign_wards(self):
         x = 0; y = 0
@@ -691,10 +691,19 @@ class MazeGame:
             #build the temporary path of just this portion of movement
             self.temporaryPath.appendleft((current_cell.x, current_cell.y))
             current_cell = current_cell.parent
+            if current_cell.x == self.agent_pos[0] and current_cell.y == self.agent_pos[1]:
+                continue
+
+        print("Path to {}".format(self.goal_pos))
 
         # add the temporary path to the running total once it is complete
         while self.temporaryPath:
-            self.fullPath.append(self.temporaryPath.popleft())
+            node = self.temporaryPath.popleft()
+            print(node, end = ", ")
+            self.fullPath.append(node)
+        print()
+
+        self.agent_pos = self.goal_pos
 
 
 ############################################################
