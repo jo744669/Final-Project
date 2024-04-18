@@ -7,6 +7,7 @@
 # dependent upon the priority of the destination ward. It should be implemented using A* and Dijkstra's Algorithms.
 ########################################
 import sys
+import tkinter as tk
 from collections import deque
 from queue import PriorityQueue
 
@@ -63,8 +64,8 @@ class MazeGame:
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
         # update self.algorithm based on if using A* or Dijkstra
-        self.locations.add((12, 24)) #for testing
-        self.locations.add((12, 23))
+        #self.locations.add((12, 24)) #for testing
+        #self.locations.add((12, 23))
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
@@ -83,13 +84,13 @@ class MazeGame:
             self.cells[self.agent_pos[0]][self.agent_pos[1]].h = self.Dijkstra_heuristic(self.agent_pos)
             self.cells[self.agent_pos[0]][self.agent_pos[1]].f = self.Dijkstra_heuristic(self.agent_pos)
 
-        # GRAPHICS - TO BE CHANGED LATER
+        # GRAPHICS
         #### The maze cell size in pixels
-        #self.cell_size = 75
-        #self.canvas = tk.Canvas(root, width=self.cols * self.cell_size, height=self.rows * self.cell_size, bg='white')
-        #self.canvas.pack()
+        self.cell_size = 20
+        self.canvas = tk.Canvas(root, width=self.cols * self.cell_size, height=self.rows * self.cell_size, bg='white')
+        self.canvas.pack()
 
-        #self.draw_maze() - DISPLAY GRAPHIC
+        self.draw_maze()  #DISPLAY GRAPHIC
 
         #### Display the optimum path in the maze
         while not delivery_locations.empty():
@@ -173,12 +174,12 @@ class MazeGame:
         self.cells[4][11].ward = "General"
         self.cells[5][11].ward = "Maternity"
         y = 12
-        while y < 29:
+        while y < 30:
             self.cells[4][y].ward = "General"
             self.cells[5][y].ward = "General"
             self.cells[6][y].ward = "General"
             y += 1
-        y = 29
+        y = 30
         while y < 38:
             self.cells[4][y].ward = "Hallway"
             self.cells[5][y].ward = "Hallway"
@@ -195,7 +196,6 @@ class MazeGame:
         self.cells[6][9].ward = "General"
         self.cells[6][10].ward = "Maternity"
         self.cells[6][11].ward = "Maternity"
-        self.cells[6][29].ward = "Hallway"
         self.cells[6][30].ward = "Emergency"
         self.cells[6][31].ward = "Emergency"
         self.cells[6][32].ward = "Emergency"
@@ -217,6 +217,7 @@ class MazeGame:
                 self.cells[x][y].ward = "General"
                 y += 1
             x += 1
+            y = 7
         self.cells[7][27].ward = "General"
         self.cells[7][28].ward = "Hallway"
         self.cells[7][29].ward = "Hallway"
@@ -231,12 +232,14 @@ class MazeGame:
                 self.cells[x][y].ward = "Emergency"
                 y += 1
             x += 1
+            y = 30
         x = 6; y = 35
         while x < 14:
             while y < 38:
                 self.cells[x][y].ward = "Admissions"
                 y += 1
             x += 1
+            y = 35
         self.cells[9][5].ward = "Hallway"
         self.cells[9][6].ward = "Isolation"
         self.cells[10][5].ward = "Hallway"
@@ -354,6 +357,7 @@ class MazeGame:
             if y > 30:
                 self.cells[16][y].ward = "ICU"
                 self.cells[17][y].ward = "ICU"
+                self.cells[18][y].ward = "ICU"
             y += 1
         self.cells[15][5].ward = "Oncology"
         self.cells[15][6].ward = "Oncology"
@@ -578,6 +582,7 @@ class MazeGame:
                 self.cells[x][y].ward = "Pediatric"
                 y += 1
             x += 1
+            y = 6
         x = 26; y = 24
         while x < 30:
             while y < 36:
@@ -587,6 +592,7 @@ class MazeGame:
                 else:
                     y += 1
             x += 1
+            y = 24
         self.cells[26][26].ward = "Medical"
         self.cells[26][27].ward = "Surgical"
         self.cells[26][28].ward = "Medical"
@@ -597,6 +603,7 @@ class MazeGame:
                 self.cells[x][y].ward = "Medical"
                 y += 1
             x += 1
+            y = 26
         self.cells[27][3].ward = "Hallway"
         self.cells[27][4].ward = "Oncology"
         self.cells[27][5].ward = "Oncology"
@@ -704,6 +711,43 @@ class MazeGame:
         print()
 
         self.agent_pos = self.goal_pos
+
+    ############################################################
+    #### This is for the GUI part. No need to modify this unless
+    #### GUI changes are needed.
+    ############################################################
+    def draw_maze(self):
+        for x in range(self.rows):
+            for y in range(self.cols):
+                if self.cells[x][y].ward == "General":
+                    color = 'red'
+                elif self.cells[x][y].ward == "Maternity":
+                    color = 'medium blue'
+                elif self.cells[x][y].ward == "Isolation":
+                    color = 'sky blue'
+                elif self.cells[x][y].ward == "Emergency":
+                    color = 'gold'
+                elif self.cells[x][y].ward == "Surgical":
+                    color = 'salmon1'
+                elif self.cells[x][y].ward == "Admissions":
+                    color = 'pink4'
+                elif self.cells[x][y].ward == "Oncology":
+                    color = 'SpringGreen4'
+                elif self.cells[x][y].ward == "Pediatric":
+                    color = 'SeaGreen1'
+                elif self.cells[x][y].ward == "Medical":
+                    color = 'chartreuse2'
+                elif self.cells[x][y].ward == "Burn":
+                    color = 'purple'
+                elif self.cells[x][y].ward == "ICU":
+                    color = 'chocolate1'
+                elif self.cells[x][y].ward == "Hematology":
+                    color = 'orange red'
+                else:
+                    color = 'grey85'
+
+                self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                             (x + 1) * self.cell_size, fill=color)
 
 
 ############################################################
@@ -1923,5 +1967,9 @@ maze = {
         (29, 37): [(28, 37), (29, 36)]
 }
 
-root = (0, 0)
+root = tk.Tk()
+root.title("A* Maze")
+#root = (0, 0)
 game = MazeGame(root, maze)
+#root.bind("<KeyPress>", game.move_agent)
+root.mainloop()
