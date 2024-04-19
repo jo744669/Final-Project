@@ -64,8 +64,8 @@ class MazeGame:
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
         # update self.algorithm based on if using A* or Dijkstra
-        #self.locations.add((12, 24)) #for testing
-        #self.locations.add((12, 23))
+        self.locations.add((12, 23))
+        self.locations.add((15, 21)) #for testing
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
@@ -113,6 +113,8 @@ class MazeGame:
                         goal = delivery_locations.get()
                     self.goal_pos = goal[1]
                     self.find_path()
+            while not delivery_locations.empty():
+                delivery_locations.get()
 
         #print the full path found for testing reasons
         #while self.fullPath:
@@ -634,6 +636,23 @@ class MazeGame:
         return self.maze[v]
 
     ############################################################
+    #### Reset g, h, and f values
+    #### Before finding next path
+    ############################################################
+    def reset_values(self, open, closed):
+        while len(open):
+            cost, node = open.popleft()
+            self.cells[node[0]][node[1]].g = float("inf")
+            self.cells[node[0]][node[1]].h = 0
+            self.cells[node[0]][node[1]].f = float("inf")
+        while len(closed):
+            node = closed.pop()
+            self.cells[node[0]][node[1]].g = float("inf")
+            self.cells[node[0]][node[1]].h = 0
+            self.cells[node[0]][node[1]].f = float("inf")
+        return None
+
+    ############################################################
     #### Algorithm
     #### Only difference between A* and Dijkstra is the heuristic function that is used
     ############################################################
@@ -652,6 +671,7 @@ class MazeGame:
             # if current node is goal node, reconstruct the path
             if current_pos == self.goal_pos:
                 self.goals_completed.add(self.goal_pos)
+                self.reset_values(open, closed)
                 open.clear()
                 closed.clear()
                 self.reconstruct_path()
@@ -692,22 +712,30 @@ class MazeGame:
     #### This is also for the GUI part
     ############################################################
     def reconstruct_path(self):
+        #rebuilds the path using the temporary and full list
         current_cell = self.cells[self.goal_pos[0]][self.goal_pos[1]]
-
+        self.temporaryPath.clear()
         while current_cell.parent:
             #build the temporary path of just this portion of movement
             self.temporaryPath.appendleft((current_cell.x, current_cell.y))
-            current_cell = current_cell.parent
             if current_cell.x == self.agent_pos[0] and current_cell.y == self.agent_pos[1]:
-                continue
+                break
+            current_cell = current_cell.parent
 
-        print("Path to {}".format(self.goal_pos))
+        if self.agent_pos != self.goal_pos:
+            print("Path to {}".format(self.goal_pos))
 
         # add the temporary path to the running total once it is complete
         while self.temporaryPath:
-            node = self.temporaryPath.popleft()
-            print(node, end = ", ")
-            self.fullPath.append(node)
+            x, y = self.temporaryPath.popleft()
+            self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                         (x + 1) * self.cell_size, fill='black')
+            text = {len(self.goals_completed)}
+            self.canvas.create_text((self.goal_pos[1] + 0.5) * self.cell_size,
+                                    (self.goal_pos[0] + 0.5) * self.cell_size, font=("Purisa", 8),
+                                    text=text, fill='white')
+            print((x, y), end = ", ")
+            self.fullPath.append((x, y))
         print()
 
         self.agent_pos = self.goal_pos
