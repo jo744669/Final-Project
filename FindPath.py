@@ -64,8 +64,9 @@ class MazeGame:
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
         # update self.algorithm based on if using A* or Dijkstra
-        self.locations.add((12, 23))
-        self.locations.add((15, 21)) #for testing
+        self.locations.add((12, 23)) #Emergency
+        self.locations.add((14, 30)) #ICU
+        self.locations.add((14, 28)) #Emergency
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
@@ -116,9 +117,7 @@ class MazeGame:
             while not delivery_locations.empty():
                 delivery_locations.get()
 
-        #print the full path found for testing reasons
-        #while self.fullPath:
-        #   print(self.fullPath.popleft(), end = ", ")
+        print("SUCCESS")
 
     def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
@@ -731,7 +730,7 @@ class MazeGame:
             if (x, y) not in self.goals_completed:
                 self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
                                          (x + 1) * self.cell_size, fill='white')
-            print((x, y), end = ", ")
+            print((x, y), end=", ")
             self.fullPath.append((x, y))
 
         print()
@@ -781,6 +780,7 @@ class MazeGame:
                 self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
                                              (x + 1) * self.cell_size, fill=color, width=0)
 
+        #look whether or not there should be walls
         for x in range(self.rows):
             for y in range(self.cols):
                 neighbors = self.maze[(x, y)]
