@@ -728,15 +728,19 @@ class MazeGame:
         # add the temporary path to the running total once it is complete
         while self.temporaryPath:
             x, y = self.temporaryPath.popleft()
-            self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
-                                         (x + 1) * self.cell_size, fill='black')
-            text = {len(self.goals_completed)}
-            self.canvas.create_text((self.goal_pos[1] + 0.5) * self.cell_size,
-                                    (self.goal_pos[0] + 0.5) * self.cell_size, font=("Purisa", 8),
-                                    text=text, fill='white')
+            if (x, y) not in self.goals_completed:
+                self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                         (x + 1) * self.cell_size, fill='white')
             print((x, y), end = ", ")
             self.fullPath.append((x, y))
+
         print()
+        self.canvas.create_rectangle(self.goal_pos[1] * self.cell_size, self.goal_pos[0] * self.cell_size, (self.goal_pos[1] + 1) * self.cell_size,
+                                     (self.goal_pos[0] + 1) * self.cell_size, fill='white')
+        text = {len(self.goals_completed)}
+        self.canvas.create_text((self.goal_pos[1] + 0.5) * self.cell_size,
+                                (self.goal_pos[0] + 0.5) * self.cell_size, font=("Purisa", 8),
+                                text=text, fill='black')
 
         self.agent_pos = self.goal_pos
 
@@ -775,7 +779,21 @@ class MazeGame:
                     color = 'grey85'
 
                 self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
-                                             (x + 1) * self.cell_size, fill=color)
+                                             (x + 1) * self.cell_size, fill=color, width=0)
+
+        for x in range(self.rows):
+            for y in range(self.cols):
+                neighbors = self.maze[(x, y)]
+
+                ##decide the if there should be a wall or not
+                if x + 1 < 30:
+                    if (x + 1, y) not in neighbors:
+                        self.canvas.create_line(y * self.cell_size, (x + 1) * self.cell_size, (y + 1) * self.cell_size,
+                                                (x + 1) * self.cell_size, fill="black")
+                if y + 1 < 38:
+                    if (x, y + 1) not in neighbors:
+                        self.canvas.create_line((y + 1) * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                                (x + 1) * self.cell_size, fill="black")
 
 
 ############################################################
