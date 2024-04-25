@@ -10,6 +10,8 @@ import sys
 import tkinter as tk
 from collections import deque
 from queue import PriorityQueue
+from time import sleep
+
 
 ######################################################
 #### A cell stores f(), g() and h() values
@@ -64,9 +66,10 @@ class MazeGame:
         #### READ FROM INPUT FILE HERE
         # add all locations to self.locations
         # update self.algorithm based on if using A* or Dijkstra
-        self.locations.add((12, 23)) #Emergency
-        self.locations.add((14, 30)) #ICU
-        self.locations.add((14, 28)) #Emergency
+        # self.locations.add((12, 23)) #Emergency
+        # self.locations.add((14, 30)) #ICU
+        # self.locations.add((14, 28)) #Emergency
+        # self.locations.add((26, 36))
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
@@ -92,6 +95,7 @@ class MazeGame:
         self.canvas.pack()
 
         self.draw_maze()  #DISPLAY GRAPHIC
+        self.flag = 0
 
         #### Display the optimum path in the maze
         while not delivery_locations.empty():
@@ -116,8 +120,8 @@ class MazeGame:
                     self.find_path()
             while not delivery_locations.empty():
                 delivery_locations.get()
-
-        print("SUCCESS")
+        if self.flag == 0:
+            print("SUCCESS")
 
     def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
@@ -704,6 +708,7 @@ class MazeGame:
                 closed.add(current_pos)
 
         print('Path does not exist')
+        self.flag = 1
         return None
 
     ############################################################
@@ -727,19 +732,10 @@ class MazeGame:
         # add the temporary path to the running total once it is complete
         while self.temporaryPath:
             x, y = self.temporaryPath.popleft()
-            if (x, y) not in self.goals_completed:
-                self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
-                                         (x + 1) * self.cell_size, fill='white')
             print((x, y), end=", ")
             self.fullPath.append((x, y))
 
         print()
-        self.canvas.create_rectangle(self.goal_pos[1] * self.cell_size, self.goal_pos[0] * self.cell_size, (self.goal_pos[1] + 1) * self.cell_size,
-                                     (self.goal_pos[0] + 1) * self.cell_size, fill='white')
-        text = {len(self.goals_completed)}
-        self.canvas.create_text((self.goal_pos[1] + 0.5) * self.cell_size,
-                                (self.goal_pos[0] + 0.5) * self.cell_size, font=("Purisa", 8),
-                                text=text, fill='black')
 
         self.agent_pos = self.goal_pos
 
@@ -795,6 +791,17 @@ class MazeGame:
                         self.canvas.create_line((y + 1) * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
                                                 (x + 1) * self.cell_size, fill="black")
 
+    def draw_path(self, event):
+        goal_index = 1
+        if event.keysym == 'Down':
+            if len(self.fullPath) != 0:
+                x, y = self.fullPath.popleft()
+                if (x, y) in self.locations:
+                    self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                                 (x + 1) * self.cell_size, fill='black')
+                else:
+                    self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                                 (x + 1) * self.cell_size, fill='white')
 
 ############################################################
 #### Representation of maze based on breakdown of provided image
@@ -2015,7 +2022,6 @@ maze = {
 
 root = tk.Tk()
 root.title("A* Maze")
-#root = (0, 0)
 game = MazeGame(root, maze)
-#root.bind("<KeyPress>", game.move_agent)
+root.bind("<KeyPress>", game.draw_path)
 root.mainloop()
