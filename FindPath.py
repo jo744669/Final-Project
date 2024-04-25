@@ -10,6 +10,7 @@ import sys
 import tkinter as tk
 from collections import deque
 from queue import PriorityQueue
+import sys
 from time import sleep
 
 
@@ -63,45 +64,48 @@ class MazeGame:
         self.fullPath = deque()  # keeps track of full path to every location in order
         self.temporaryPath = deque() #keeps track of path from start to goal to build backwards
 
-        #### READ FROM INPUT FILE HERE
-        # add all locations to self.locations
-        # update self.algorithm based on if using A* or Dijkstra
+        #### READ FROM INPUT FILE
+        algorithm, start, locations = self.read_input_file("FindPath.txt")
+
+        #Check if the algorithm is one of the options or invalid
+        #if it is one of the options, assign the algorithm variable
+        if algorithm == "A*":
+            self.algorithm = 1
+        elif algorithm == "Dijkstra":
+            self.algorithm = 2
+        else:
+            print("Algorithm entered is invalid. Try again")
+            return
+
+        #ensure that the start location is in range, then assign to agent position
+        if start[0] < 0 or start[0] > 29:
+            print("Invalid x coordinate for starting position. Try again")
+            return
+        elif start[1] < 0 or start[1] > 37:
+            print("Invalid y coordinate for starting position. Try again")
+            return
+        else:
+            self.agent_pos = start
+
+        #ensure that each location is in range before adding it to the list of locations
+        for location in locations:
+            if location[0] < 0 or location[0] > 29:
+                print("Invalid x coordinate for a goal position. Try again")
+                return
+            elif location[1] < 0 or location[1] > 37:
+                print("Invalid y coordinate for a goal position. Try again")
+                return
+            else:
+                self.locations.add(location)
         # self.locations.add((12, 23)) #Emergency
         # self.locations.add((14, 30)) #ICU
         # self.locations.add((14, 28)) #Emergency
         # self.locations.add((26, 36))
-        def read_input_file(filename):
-            with open(filename, 'r') as file:
-                lines = file.readlines()
-                # Extract delivery algorithm, start location, and delivery locations
-                delivery_algorithm = None
-                start_location = None
-                delivery_locations = []
-        
-                for line in lines:
-                    if line.startswith('Delivery algorithm:'):
-                        delivery_algorithm = line.split(':')[1].strip()
-                    elif line.startswith('Start location:'):
-                        start_location_str = line.split(':')[1].strip()
-                        # Correctly parse the start location string
-                        start_location = tuple(map(int, start_location_str.split(',')))
-                    elif line.startswith('Delivery locations:'):
-                        delivery_locations_str = line.split(':')[1].strip()
-                        # Correctly parse the delivery locations string
-                        delivery_locations = [loc.strip() for loc in delivery_locations_str.split(',')]
-        
-                if delivery_algorithm is None or start_location is None or not delivery_locations:
-                    raise ValueError("Input file format is incorrect.")
-        
-            return delivery_algorithm, start_location, delivery_locations
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
         for x in self.locations:
             delivery_locations.put((self.cells[x[0]][x[1]].priority, x))
-
-        ### Assign the algorithm based on input - 1 for A*, 2 for Dijkstra - A* by default
-        self.algorithm = 1
 
         #### Start state's initial values for f(n) = g(n) + h(n)
         self.cells[self.agent_pos[0]][self.agent_pos[1]].g = 0
@@ -146,6 +150,45 @@ class MazeGame:
                 delivery_locations.get()
         if self.flag == 0:
             print("SUCCESS")
+
+    def read_input_file(self, filename):
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+            # Extract delivery algorithm, start location, and delivery locations
+            delivery_algorithm = None
+            start_location = None
+            delivery_locations = []
+            deliveries = set()
+
+            for line in lines:
+                if line.startswith('Delivery algorithm:'):
+                    delivery_algorithm = line.split(':')[1].strip()
+                elif line.startswith('Start location:'):
+                    start_location_str = line.split(':')[1].strip()
+                    # Correctly parse the start location string
+                    if not start_location_str[0].isdigit():
+                        print("Start location entered is not a number. Try again")
+                        return
+                    start_location = tuple(map(int, start_location_str.split(',')))
+                elif line.startswith('Delivery locations:'):
+                    delivery_locations_str = line.split(':')[1].strip()
+                    # Correctly parse the delivery locations string
+                    delivery_locations = [loc.strip() for loc in delivery_locations_str.split(',')]
+                    #convert the string of delivery locations to a list of tuples
+                    index_x = 0; index_y = 1
+                    counter = 0
+                    while counter < len(delivery_locations):
+                        if not delivery_locations[index_x].isdigit():
+                            print("Delivery location entered is not a number. Try again")
+                            return
+                        deliveries.add((tuple(map(int, (delivery_locations[index_x], delivery_locations[index_y])))))
+                        counter += 2; index_x += 2; index_y += 2
+            file.close()
+
+            if delivery_algorithm is None or start_location is None or not delivery_locations:
+                raise ValueError("Input file format is incorrect.")
+
+        return delivery_algorithm, start_location, deliveries
 
     def assign_priorities(self):
         #function to check the ward of the cell at the given position and assign priority accordingly
