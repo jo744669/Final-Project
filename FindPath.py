@@ -63,6 +63,7 @@ class MazeGame:
         delivery_locations = PriorityQueue()
         self.fullPath = deque()  # keeps track of full path to every location in order
         self.temporaryPath = deque() #keeps track of path from start to goal to build backwards
+        self.visited = set() #for GUI updates
 
         #### READ FROM INPUT FILE
         algorithm, start, locations = self.read_input_file("FindPath.txt")
@@ -71,8 +72,10 @@ class MazeGame:
         #if it is one of the options, assign the algorithm variable
         if algorithm == "A*":
             self.algorithm = 1
+            print("Using A* algorithm...")
         elif algorithm == "Dijkstra":
             self.algorithm = 2
+            print("Using Dijkstra's algorithm...")
         else:
             print("Algorithm entered is invalid. Try again")
             return
@@ -97,10 +100,6 @@ class MazeGame:
                 return
             else:
                 self.locations.add(location)
-        # self.locations.add((12, 23)) #Emergency
-        # self.locations.add((14, 30)) #ICU
-        # self.locations.add((14, 28)) #Emergency
-        # self.locations.add((26, 36))
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
@@ -774,7 +773,7 @@ class MazeGame:
             if current_pos not in closed:
                 closed.add(current_pos)
 
-        print('Path does not exist')
+        print('FAILURE. Path does not exist')
         self.flag = 1
         return None
 
@@ -859,7 +858,6 @@ class MazeGame:
                                                 (x + 1) * self.cell_size, fill="black")
 
     def draw_path(self, event):
-        goal_index = 1
         if event.keysym == 'Down':
             if len(self.fullPath) != 0:
                 x, y = self.fullPath.popleft()
@@ -867,8 +865,13 @@ class MazeGame:
                     self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
                                                  (x + 1) * self.cell_size, fill='black')
                 else:
-                    self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
-                                                 (x + 1) * self.cell_size, fill='white')
+                    if (x, y) in self.visited:
+                        self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                                     (x + 1) * self.cell_size, fill='dim gray')
+                    else:
+                        self.canvas.create_rectangle(y * self.cell_size, x * self.cell_size, (y + 1) * self.cell_size,
+                                                    (x + 1) * self.cell_size, fill='white')
+                self.visited.add((x, y))
 
 ############################################################
 #### Representation of maze based on breakdown of provided image
