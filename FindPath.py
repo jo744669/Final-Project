@@ -70,6 +70,30 @@ class MazeGame:
         # self.locations.add((14, 30)) #ICU
         # self.locations.add((14, 28)) #Emergency
         # self.locations.add((26, 36))
+        def read_input_file(filename):
+            with open(filename, 'r') as file:
+                lines = file.readlines()
+                # Extract delivery algorithm, start location, and delivery locations
+                delivery_algorithm = None
+                start_location = None
+                delivery_locations = []
+        
+                for line in lines:
+                    if line.startswith('Delivery algorithm:'):
+                        delivery_algorithm = line.split(':')[1].strip()
+                    elif line.startswith('Start location:'):
+                        start_location_str = line.split(':')[1].strip()
+                        # Correctly parse the start location string
+                        start_location = tuple(map(int, start_location_str.split(',')))
+                    elif line.startswith('Delivery locations:'):
+                        delivery_locations_str = line.split(':')[1].strip()
+                        # Correctly parse the delivery locations string
+                        delivery_locations = [loc.strip() for loc in delivery_locations_str.split(',')]
+        
+                if delivery_algorithm is None or start_location is None or not delivery_locations:
+                    raise ValueError("Input file format is incorrect.")
+        
+            return delivery_algorithm, start_location, delivery_locations
 
         #### General list to hold delivery locations - to be able to look at all locations
         #### Fill this list from input file - fill priority queue from this list
